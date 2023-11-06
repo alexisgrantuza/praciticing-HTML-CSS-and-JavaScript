@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 11 TO DO List</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="datepicker-2.css" rel="stylesheet">
+  <link rel="stylesheet" href="12-todo-list-button.css">
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      height: 100vh;
+      background: #161623;
+    }
+
+    p {
+      font-weight: bold;
+      margin-bottom: 50px;
+      text-align: center;
+      color: #fff;
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* ... (other styles for the main-container) ... */
+    }
+
+    .container {
+      position: absolute;
+      transform: translate(-50%, -90%);
+      top: 30%;
+      left: 50%;
+      margin-bottom: 10px; /* Add margin between container and list-container */
+    }
+
+    .list-container {
+      max-height: 60vh; /* Set max height for the list-container */
+      width: 520px;
+      margin-left: 10px;
+      overflow-y: auto; /* Enable scrolling within the list-container */
+      /* width */
+      position: absolute;
+      top: 50%;
+      color: #fff;
+    }
+
+    /* Center the .todo-input-grid */
+    .todo-input-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .todo-grid,
+    .todo-input-grid {
+      display: grid;
+      grid-template-columns: 200px 150px 140px;
+      column-gap: 10px;
+      row-gap: 10px;
+      align-items: center;
+    }
+
+    .todo-input-grid {
+      margin-bottom: 20px;
+    }
+
+    .name-input:active {
+      border-bottom: 1px solid #3F51B5;
+      box-shadow: 0 1px 0 0 #3F51B5;
+    }
+
+
+    /* width */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1; 
+    }
+    
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #888; 
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555; 
+    }
+
+    /* Define colors */
+    :root {
+      --fuschia: green;
+      --red: red;
+      --delete-button-bg: var(--red);
+      --button-bg: var(--fuschia);
+      --button-text-color: #fff;
+      --baby-blue: #f8faff;
+    }
+
+    .add-todo-button {
+      background-color: var(--button-bg);
+      color: var(--button-text-color);
+      -webkit-appearance: none;
+      appearance: none;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      cursor: pointer;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-left: 40px;
+      position: relative;
+      transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
+      box-shadow: 0 2px 25px rgba(0, 254, 47, 0.502);
+    }
+
+    .add-todo-button:focus {
+      outline: 0;
+    }
+
+    .add-todo-button:before,
+    .add-todo-button:after {
+      position: absolute;
+      content: '';
+      display: block;
+      width: 140%;
+      height: 100%;
+      left: -20%;
+      z-index: -1000;
+      transition: all ease-in-out 0.5s;
+      background-repeat: no-repeat;
+    }
+
+    .add-todo-button:before {
+      display: none;
+      top: -75%;
+      background-image: radial-gradient(
+          circle,
+          var(--button-bg) 20%,
+          transparent 20%
+        ),
+        radial-gradient(
+          circle,
+          transparent 20%,
+          var(--button-bg) 20%,
+          transparent 30%
+        ),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(
+          circle,
+          transparent 10%,
+          var(--button-bg) 15%,
+          transparent 20%
+        ),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%);
+      background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
+    }
+
+    .add-todo-button:after {
+      display: none;
+      bottom: -75%;
+      background-image: radial-gradient(
+          circle,
+          var(--button-bg) 20%,
+          transparent 20%
+        ),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(
+          circle,
+          transparent 10%,
+          var(--button-bg) 15%,
+          transparent 20%
+        ),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--button-bg) 20%, transparent 20%);
+      background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
+    }
+
+    .add-todo-button:active {
+      transform: scale(0.9);
+      background-color: rgb(3, 102, 4);
+      box-shadow: 0 2px 25px rgba(43, 255, 0, 0.99);
+    }
+
+    .add-todo-button.animate:before {
+      display: block;
+      animation: topBubbles ease-in-out 0.75s forwards;
+    }
+
+    .add-todo-button.animate:after {
+      display: block;
+      animation: bottomBubbles ease-in-out 0.75s forwards;
+    }
+
+    .delete-todo-button {
+      background-color: var(--delete-button-bg);
+      color: var(--button-text-color);
+      -webkit-appearance: none;
+      appearance: none;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      cursor: pointer;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-left: 40px;
+      position: relative;
+      transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
+      box-shadow: 0 2px 25px rgba(254, 0, 0, 0.502);
+    }
+
+    .delete-todo-button:focus {
+      outline: 0;
+    }
+
+    .delete-todo-button:before,
+    .delete-todo-button:after {
+      position: absolute;
+      content: '';
+      display: block;
+      width: 140%;
+      height: 100%;
+      left: -20%;
+      z-index: -1000;
+      transition: all ease-in-out 0.5s;
+      background-repeat: no-repeat;
+    }
+
+    .delete-todo-button:before {
+      display: none;
+      top: -75%;
+      background-image: radial-gradient(
+          circle,
+          var(--delete-button-bg) 20%,  /* Use var(--delete-button-bg) instead of var(--red) */
+          transparent 20%
+        ),
+        radial-gradient(
+          circle,
+          transparent 20%,
+          var(--delete-button-bg) 20%,
+          transparent 30%
+        ),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(
+          circle,
+          transparent 10%,
+          var(--delete-button-bg) 15%,
+          transparent 20%
+        ),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%);
+      background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
+    }
+
+    .delete-todo-button:after {
+      display: none;
+      bottom: -75%;
+      background-image: radial-gradient(
+          circle,
+          var(--delete-button-bg) 20%,  /* Use var(--delete-button-bg) instead of var(--red) */
+          transparent 20%
+        ),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(
+          circle,
+          transparent 10%,
+          var(--delete-button-bg) 15%,
+          transparent 20%
+        ),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%),
+        radial-gradient(circle, var(--delete-button-bg) 20%, transparent 20%);
+      background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
+    }
+
+    .delete-todo-button:active {
+      transform: scale(0.9);
+      background-color: rgba(255, 0, 0, 0.615);
+      box-shadow: 0 2px 25px rgba(255, 0, 130, 0.2);
+    }
+
+    .delete-todo-button.animate:before {
+      display: block;
+      animation: topBubbles ease-in-out 0.75s forwards;
+    }
+
+    .delete-todo-button.animate:after {
+      display: block;
+      animation: bottomBubbles ease-in-out 0.75s forwards;
+    }
+
+
+    @keyframes topBubbles {
+      0% {
+        background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%, 40% 90%, 55% 90%, 70% 90%;
+      }
+      50% {
+        background-position: 0% 80%, 0% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%, 50% 50%, 65% 20%, 90% 30%;
+      }
+      100% {
+        background-position: 0% 70%, 0% 10%, 10% 30%, 20% -10%, 30% 20%, 22% 40%, 50% 40%, 65% 10%, 90% 20%;
+        background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+      }
+    }
+
+    @keyframes bottomBubbles {
+      0% {
+        background-position: 10% -10%, 30% 10%, 55% -10%, 70% -10%, 85% -10%, 70% -10%, 70% 0%;
+      }
+      50% {
+        background-position: 0% 80%, 20% 80%, 45% 60%, 60% 100%, 75% 70%, 95% 60%, 105% 0%;
+      }
+      100% {
+        background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%, 110% 10%;
+        background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+      }
+    }
+
+    
+
+    label {
+      position: relative;
+      display: block;
+    }
+    label > input {
+      position: relative;
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px solid #9e9e9e;
+      border-radius: 0;
+      outline: none;
+      height: 45px;
+      width: 150px;
+      font-size: 16px;
+      margin: 0 0 30px 0;
+      padding: 0;
+      box-shadow: none;
+      box-sizing: content-box;
+      transition: all .3s;
+      color: #fff;
+    }
+    label > input:valid + span {
+      transform: translateY(-25px) scale(0.8);
+      transform-origin: 0;
+    }
+    label > input:valid {
+      border-bottom: 1px solid #3F51B5;
+      box-shadow: 0 1px 0 0 #3F51B5;
+    }
+    label > span {
+      color: #9e9e9e;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 16px;
+      cursor: text;
+      transition: .2s ease-out;
+    }
+    label > input:focus + span {
+      transform: translateY(-25px) scale(0.8);
+      transform-origin: 0;
+      color: #3F51B5;
+    }
+    label > input:focus {
+      border-bottom: 1px solid #3F51B5;
+    }
+
+    /*Bootstrap Calendar*/
+    .datepicker {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      backdrop-filter: blur(25px);
+      border-radius: 10px;
+      padding: 0;
+      color: #fff;
+    }
+
+    .dateselect:focus + span {
+      transform: translateY(-25px) scale(0.8);
+      transform-origin: 0;
+      color: #3F51B5;
+    }
+
+    .dateselect:focus {
+      border-bottom: 1px solid #3F51B5;
+      box-shadow: 0 1px 0 0 #3F51B5;
+      backdrop-filter: blur(10px); /* Apply the blur effect when focused */
+    }
+    .datepicker-days table thead, .datepicker-days table tbody, .datepicker-days table tfoot {
+        padding: 10px;
+        display: list-item;
+    }
+    .datepicker-days table thead, .datepicker-months table thead, .datepicker-years table thead, .datepicker-decades table thead, .datepicker-centuries table thead {
+        background: #3546b3;
+        color: #ffffff;
+        border-radius: 0;
+    }
+    .datepicker-days table thead tr:nth-child(2n+0) td, .datepicker-days table thead tr:nth-child(2n+0) th {
+        border-radius: 3px;
+    }
+    .datepicker-days table thead tr:nth-child(3n+0) {
+        text-transform: uppercase;
+        font-weight: 300 !important;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .table-condensed > tbody > tr > td, .table-condensed > tbody > tr > th, .table-condensed > tfoot > tr > td, .table-condensed > tfoot > tr > th, .table-condensed > thead > tr > td, .table-condensed > thead > tr > th {
+        padding: 11px 13px;
+    }
+    .datepicker-months table thead td, .datepicker-months table thead th, .datepicker-years table thead td, .datepicker-years table thead th, .datepicker-decades table thead td, .datepicker-decades table thead th, .datepicker-centuries table thead td, .datepicker-centuries table thead th {
+        border-radius: 0;
+    }
+    .datepicker td, .datepicker th {
+        border-radius: 50%;
+        padding: 0 12px;
+    }
+    .datepicker-days table thead, .datepicker-months table thead, .datepicker-years table thead, .datepicker-decades table thead, .datepicker-centuries table thead {
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        backdrop-filter: blur(25px);
+        color: #ffffff;
+    }
+    .datepicker table tr td.active, .datepicker table tr td.active:hover, .datepicker table tr td.active.disabled, .datepicker table tr td.active.disabled:hover {
+        background-image: none;
+    }
+    .datepicker .prev, .datepicker .next {
+        color: rgba(255, 255, 255, 0.5);
+        transition: 0.3s;
+        width: 37px;
+        height: 37px;
+    }
+    .datepicker .prev:hover, .datepicker .next:hover {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.99);
+        font-size: 21px;
+    }
+    .datepicker .datepicker-switch {
+        font-size: 24px;
+        font-weight: 400;
+        transition: 0.3s;
+    }
+    .datepicker .datepicker-switch:hover {
+        color: rgba(255, 255, 255, 0.7);
+        background: transparent;
+    }
+    .datepicker table tr td span {
+        border-radius: 2px;
+        margin: 3%;
+        width: 27%;
+    }
+    .datepicker table tr td span.active, .datepicker table tr td span.active:hover, .datepicker table tr td span.active.disabled, .datepicker table tr td span.active.disabled:hover {
+      background-color: #3546b3;
+      background-image: none;
+    }
+    .dropdown-menu {
+        border: 1px solid rgba(0,0,0,.1);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    }
+    .datepicker-dropdown.datepicker-orient-top:before {
+        border-top: 7px solid rgba(0,0,0,.1);
+    }
+
+    /* Change background color to #161623 when hovering */
+    .datepicker table tr td.day:hover,
+    .datepicker table tr td.day.focused,
+    .datepicker table tr td span:hover,
+    .datepicker table tr td span.focused,
+    .datepicker tfoot tr th:hover,
+    .input-append.date .add-on:hover,
+    .input-prepend.date .add-on:hover {
+      background: #161623;
+      cursor: pointer;
+    }
+
+    .animate3 {
+      animation: removed-item-animation 1s cubic-bezier(0.55, -0.04, 0.91, 0.94) forwards;
+      /*transform origin is moved to the bottom left corner*/
+      transform-origin: 0% 100%;
+      overflow: hidden;
+      }
+
+      @keyframes removed-item-animation {
+        0% {
+          opacity: 1;
+          transform: rotateZ(0);
+          overflow: hidden;
+          min-width: 420px;
+      }
+
+        100% {
+          opacity: 0;
+          transform: translateY(600px) rotateZ(90deg);
+          overflow: hidden;
+          max-width: 200px;
+        }
+    
+    }
+
+    
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="container">
+      <p>Todo List / Due Date Form</p>
+      <div class="todo-list-container">
+        <!-- ... Your todo list input form ... -->
+        <div class="todo-input-container">
+          <div class="todo-input-grid">
+            <label>
+              <input type="text" class="js-due-date-input js-name-input" required="required"/>
+              <span>Todo Name</span>
+            </label>
+
+            <label>
+              <input type="text" class="dateselect" required="required"/>
+              <span>Date</span>
+            </label>
+            <button class="add-todo-button bubbly-button js-add-todo-button">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="list-container">
+      <div class="js-todo-list todo-grid">
+        <ul class="reminder">
+          <!--this is the list of the item that will show-->
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    
+    const todoList = JSON.parse(localStorage.getItem('todoList')) || [];
+
+    renderTodoList();
+
+    function renderTodoList() {
+      let todoListHTML = '';
+
+
+      todoList.forEach((todoObject, index) => {
+        //const name = todoObject.name;
+        //const dueDate = todoObject.dueDate;
+        const { name, dueDate } = todoObject;
+
+        let html = `
+          <div>${name}</div>
+          <div>${dueDate}</div>
+          <button class = "delete-todo-button bubbly-button js-delete-todo-button">Delete</button>
+          `
+        
+        todoListHTML += html;
+      }) // it is the same as for loop but it easier to read when you write the code into forEach() method and make it better
+
+      /*
+      for (let i = 0; i < todoList.length; i++) {
+        const todoObject = todoList[i];
+        //const name = todoObject.name;
+        //const dueDate = todoObject.dueDate;
+        const { name, dueDate } = todoObject;
+
+        const html = `
+          <div>${name}</div>
+          <div>${dueDate}</div>
+          <button onclick = "
+            todoList.splice(${i}, 1);
+            renderTodoList();
+            saveToStorage();
+          " class = "delete-todo-button">Delete</button
+          </div>`
+        ;
+        todoListHTML += html;
+      }  */
+
+      document.querySelector('.js-todo-list')
+        .innerHTML = todoListHTML;
+
+
+      document.querySelectorAll('.js-delete-todo-button')
+        .forEach((deleteButton, index) => {
+          deleteButton.addEventListener('click', () => {
+            deleteTodo(index);
+          });
+        });
+
+
+      // Check if the ADD button has the 'animate' class and remove it if necessary
+      const addButton = document.querySelector('.js-add-todo-button');
+      if (addButton.classList.contains('animate3')) {
+        addButton.classList.remove('animate3');
+      } 
+    }
+
+    document.querySelector('.js-add-todo-button')
+      .addEventListener('click', () => {
+        addTodo();
+      });
+
+    
+    function deleteTodo(index) {
+      const todoGrid = document.querySelector('.js-todo-list');
+      todoGrid.classList.add('animate3');
+
+      setTimeout(() => {
+        todoList.splice(index, 1);
+        renderTodoList();
+        saveToStorage();
+        todoGrid.classList.remove('animate3');
+      }, 1000);
+    }  
+
+    function addTodo() {
+        const inputElement = document.querySelector('.js-name-input');
+
+        const name = inputElement.value;
+
+        const dateInputElement = document.querySelector('.dateselect');
+
+        const dueDate = dateInputElement.value;
+
+        todoList.push({
+          //name: name,
+          //dueDate: dueDate ||| do the same thing
+          name,
+          dueDate
+        });
+
+        renderTodoList();
+
+
+        // Whenever we update the todo list, save in localStorage.
+        saveToStorage();
+
+        inputElement.value = ''; // Clear the name input
+        dateInputElement.value = ''; // Clear the date input
+        dateInputElement.nextElementSibling.classList.remove('active'); // Remove the 'active' class from the date label
+
+        
+      }
+
+      function saveToStorage() {
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+      }
+    /*
+    const todoList1 = [
+      'make dinner',
+      'wash dishes',
+      'watch youtube'
+    ]
+
+    for (let i = 0; i < todoList1.length; i++) {
+      const value = todoList1[i]
+      console.log(i)
+    }
+
+    /*
+    const nums =  [1, 1, 3];
+    let total = 0;
+
+    for (let i = 0; i < nums.length; i++) {
+      const num = nums[i];
+      total += num;
+    }
+
+    console.log(total);
+
+    const numsDoubled = [];
+
+    for (let i = 0; i < nums.length; i++) {
+      const num = nums[i];
+
+      numsDoubled.push(num * 2);
+      console.log(numsDoubled);
+    }*/
+
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="rawfile.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.dateselect').datepicker({
+        format: 'yyyy-mm-dd', // You can change the date format here
+        autoclose: true,
+        todayHighlight: true
+      });
+
+      $('.dateselect').on('focus', function() {
+        $(this).closest('label').find('span').addClass('active');
+      });
+
+      $('.dateselect').on('blur', function() {
+        if (!$(this).val()) {
+          $(this).closest('label').find('span').removeClass('active');
+        }
+      });
+
+      $('.dateselect').each(function() {
+        if ($(this).val()) {
+          $(this).closest('label').find('span').addClass('active');
+        }
+      });
+    });
+  </script>
+  <script>
+    var animateButton = function(e) {
+      
+      e.preventDefault;
+      //reset animation
+      e.target.classList.remove('animate');
+
+      e.target.classList.add('animate');
+      setTimeout(function(){
+        e.target.classList.remove('animate');
+      },800);
+    };
+
+    var bubblyButtons = document.getElementsByClassName("js-add-todo-button");
+
+    for (var i = 0; i < bubblyButtons.length; i++) {
+    bubblyButtons[i].addEventListener('click', animateButton, true);
+    }
+  </script>
+</body>
+</html>

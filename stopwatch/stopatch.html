@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>StopWatch</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="stopatch.css">
+</head>
+<body>
+  <div class="StopWatch">
+    <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+        <div id="title">
+          <div class="display-container-sub">
+            <h1 class="display display-timer">00:00:00</h1>
+          </div>
+          <div class="button-display">
+            <button class="startButton start-button">Start</button>
+            <button class="stopButton stop-button">Stop</button>
+            <button class="resetButton reset-button">Reset</button>
+          </div>
+          
+        </div>
+      </div>
+    <!--
+    <div class="time">
+      <span class="hour">00</span>
+      <span class="minute">00</span>
+      <span class="seconds">00</span>
+      <span class="count">00</span>
+    </div>
+    -->
+  </div>
+  
+  <script>
+    
+    const display = document.querySelector('.display-timer')
+    const startButton = document.querySelector('.start-button');
+    const stopButton = document.querySelector('.stop-button');
+    const resetButton = document.querySelector('.reset-button');
+
+    let milliseconds = 0;
+    let timerInterval;
+
+    function updateDisplay() {
+      const hour = Math.floor(milliseconds / 3600000);
+      const minute = Math.floor((milliseconds % 3600000) / 60000);
+      const seconds = Math.floor((milliseconds % 60000) / 1000);
+      const formattedTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+
+      display.textContent = formattedTime;
+
+      localStorage.setItem('milliseconds', milliseconds.toString())
+    }
+
+    const storedMilliseconds = localStorage.getItem('milliseconds');
+    if (storedMilliseconds) {
+      milliseconds = parseInt(storedMilliseconds, 10);
+      updateDisplay();
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        milliseconds += 1000;
+        updateDisplay();
+      }, 1000);
+    }
+
+    startButton.addEventListener('click', () => {
+      startTimer();
+    });
+
+
+    stopButton.addEventListener('click', () => {
+      clearInterval(timerInterval);
+    });
+
+    resetButton.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      milliseconds = 0;
+      updateDisplay();
+    });
+    
+
+
+
+
+    // let create another script for our Stopwatch
+    /*
+    const display = document.querySelector('.display')
+    const startButton = document.querySelector('.start-button');
+    const stopButton = document.querySelector('.stop-button');
+    const resetButton = document.querySelector('.reset-button');
+
+    let hour = 0;
+    let minute = 0;
+    let seconds = 0;
+    let count = 0;
+
+    let timerTimeout;
+
+    function stopWatch() {
+      if(timer) {
+        count++;
+
+
+        if(count == 100) {
+          seconds++;
+          count = 0;
+        }
+
+        if(seconds == 60) {
+          minute++;
+          seconds = 0;
+        }
+
+        if(minute == 60) {
+          hour++;
+          minute = 0;
+          seconds = 0;
+        }
+
+        let hourString = hour;
+        let minuteString = minute;
+        let secondsStrinng = seconds;
+        let countString = count;
+
+        if (hourString < 10) {
+          hourString = "0" + hourString;
+        }
+
+        if (minuteString < 10) {
+          minuteString = "0" + minuteString;
+        }
+        
+        if (secondsStrinng < 10) {
+          secondsStrinng = "0" + secondsStrinng;
+        }
+        
+        if (count < 10) {
+          countString = "0" + countString;
+        }
+
+
+        document.querySelector('.hour').innerHTML = hourString;
+        document.querySelector('.minute').innerHTML = minuteString;
+        document.querySelector('.seconds').innerHTML = secondsStrinng;
+        document.querySelector('.count').innerHTML = countString;
+        timerTimeout = setTimeout(stopWatch, 10);
+      }
+    }
+
+    
+
+    startButton.addEventListener('click', () => {
+      clearTimeout(timerTimeout);
+      timer = true;
+      stopWatch();
+    });
+
+    stopButton.addEventListener('click', () => {
+      clearTimeout(timerTimeout);
+      timer = false;
+    });
+
+    resetButton.addEventListener('click', () => {
+      clearTimeout(timerTimeout);
+      timer = false;
+      hour = 0;
+      minute = 0;
+      seconds = 0;
+      count = 0;
+      document.querySelector('.hour').innerHTML = "00";
+      document.querySelector('.minute').innerHTML = "00";
+      document.querySelector('.seconds').innerHTML = "00";
+      document.querySelector('.count').innerHTML = "00";
+
+    });
+    */
+  </script>
+  
+</body>
+</html>

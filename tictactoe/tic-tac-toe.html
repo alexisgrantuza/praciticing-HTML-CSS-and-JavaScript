@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <title>tik-tik GAME</title>
+  <style>
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: black;
+      background: rgb(2,0,36);
+      background: linear-gradient(30deg, rgba(2,0,36,1) 0%, rgba(93,9,121,1) 35%, rgba(0,211,254,1) 92%, rgba(175,241,255,1) 100%, rgba(0,212,255,1) 100%);
+      overflow: hidden;
+      font-family: Lato;
+    }
+
+    .wrapper {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 2px;
+    }
+
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      width: 100%;
+      height: 100%;
+      background-color: lightgray;
+      cursor: pointer;
+      transition: box-shadow .15s;
+    }
+    
+    .cell:hover{
+      color: #6410ff;
+      box-shadow: 0 0 .2rem #fff,
+                  0 0 .2rem #fff,
+                  0 0 2rem #bc13fe,
+                  0 0 0.8rem #bc13fe,
+                  0 0 2.8rem #bc13fe,
+                  inset 0 0 1.3rem #bc13fe; 
+      transform: scale(1.15);
+    }
+
+    .cell.x {
+      color: blue;
+    }
+
+    .cell.o {
+      color: red;
+    }
+    
+    #restart {
+      font-size: 1.3em;
+      padding: 1em;
+      border-radius: 8px;
+      background-color: #0a0027;
+      color: #ffffff;
+      border: none;
+      position: relative;
+      margin: 1.5em auto 0 auto;
+      display: block;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #restart:hover{
+      color: #fff;
+      text-shadow:
+        0 0 7px #fff,
+        0 0 10px #fff,
+        0 0 21px #fff,
+        0 0 42px #bc13fe,
+        0 0 82px #bc13fe,
+        0 0 92px #bc13fe,
+        0 0 102px #bc13fe,
+        0 0 151px #bc13fe;
+
+        font-size: 1.3rem;
+        animation: pulsate 1.5s infinite alternate;  
+        border: 0.2rem solid #fff;
+        border-radius: 1.2rem;
+        padding: 0.6em;
+        box-shadow: 0 0 .2rem #fff,
+                  0 0 .2rem #fff,
+                  0 0 2rem #bc13fe,
+                  0 0 0.8rem #bc13fe,
+                  0 0 2.8rem #bc13fe,
+                  inset 0 0 1.3rem #bc13fe;  
+    }
+
+    .popup {
+      background: rgb(2,0,36);
+      background: linear-gradient(30deg, rgba(2,0,36,1) 0%, rgba(93,9,121,1) 35%, rgba(0,211,254,1) 92%, rgba(175,241,255,1) 100%, rgba(0,212,255,1) 100%);
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      display: flex;
+      z-index: 2;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      letter-spacing: 10px;
+      padding-left: 10px;
+    }
+
+    .popup #message {
+      font-family: Poppins, sans-serif;
+      text-transform: uppercase;
+      font-size: 18vmin;
+      text-align: center;
+      color: #111111;
+      letter-spacing: 0.2em;
+      background: linear-gradient(to right, #ff5757, #ffb53f, #fff100, #9ae900, #15ffe1, #816aff, #ff0040);
+      -webkit-background-clip: text;
+      -webkit-text-stroke: 0.1em transparent;
+      background-size: 300% auto;
+      animation: gradient 3.5s
+        ease-in-out infinite;
+      margin-top: -10px;
+    }
+
+    @keyframes gradient {
+      0%   {
+        background-position: 0% 50%
+      }
+      50%   {
+        background-position: 100% 50%
+      }
+      100%   {
+        background-position: 0% 50%
+      }
+    }
+
+    #new-game {
+      background-color: transparent;
+      border: none;
+      color: #ffffff;
+      border-radius: 0.2em;
+      border: none;
+      cursor: pointer;
+      transition: 0.15s;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: clamp(1rem, 10vw, 4.2rem);
+      line-height: 0.75em;
+      text-align: center;
+      text-shadow: 3px 1px 1px #4af7ff, 2px 2px 1px #165bfb, 4px 2px 1px #4af7ff,
+        3px 3px 1px #165bfb, 5px 3px 1px #4af7ff, 4px 4px 1px #165bfb,
+        6px 4px 1px #4af7ff, 5px 5px 1px #165bfb, 7px 5px 1px #4af7ff,
+        6px 6px 1px #165bfb, 8px 6px 1px #4af7ff, 7px 7px 1px #165bfb,
+        9px 7px 1px #4af7ff;
+      transform: skew(0, -10deg); 
+      margin-top: -60px; 
+    }
+
+    #new-game::before {
+      content: attr(data-text);
+      position: absolute;
+      text-shadow: 2px 2px 1px #e94aa1, -1px -1px 1px #c736f9,
+        -2px 2px 1px #e94aa1, 1px -1px 1px #f736f9;
+      z-index: 1;
+    }
+
+    #new-game:hover{
+      color: #fff;
+      text-shadow:
+        0 0 7px #fff,
+        0 0 10px #fff,
+        0 0 21px #fff,
+        0 0 42px #bc13fe,
+        0 0 82px #bc13fe,
+        0 0 92px #bc13fe,
+        0 0 102px #bc13fe,
+        0 0 151px #bc13fe;
+
+        font-size: 3.3rem;
+    }   
+
+    .popup.hide {
+      display: none;
+    }
+
+    
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="board">
+      <div class="cell" data-row="0" data-col="0"></div>
+      <div class="cell" data-row="0" data-col="1"></div>
+      <div class="cell" data-row="0" data-col="2"></div>
+      <div class="cell" data-row="1" data-col="0"></div>
+      <div class="cell" data-row="1" data-col="1"></div>
+      <div class="cell" data-row="1" data-col="2"></div>
+      <div class="cell" data-row="2" data-col="0"></div>
+      <div class="cell" data-row="2" data-col="1"></div>
+      <div class="cell" data-row="2" data-col="2"></div>
+    </div>
+
+    <button id="restart">
+      Restart
+    </button>
+  </div>
+  <div class="popup hide">
+    <p id="message"></p>
+    <div id="new-game" data-text="New Game">New Game</div>
+  </div>
+  <script>
+    // JavaScript code here
+    const board = document.querySelector('.board');
+    const cells = document.querySelectorAll('.cell');
+    let popupRef = document.querySelector(".popup");
+    let newgameBtn = document.getElementById('new-game');
+    let restartBtn = document.getElementById('restart');
+    let msgRef = document.getElementById('message');
+    let currentPlayer = 'x';
+    let gameBoard = [
+      ['', '', ''],
+      ['', '', ''],
+      ['', '', ''],
+    ];
+
+    function checkWinner() {
+      const winPatterns = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]],
+      ];
+
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (
+          gameBoard[a[0]][a[1]] &&
+          gameBoard[a[0]][a[1]] === gameBoard[b[0]][b[1]] &&
+          gameBoard[a[0]][a[1]] === gameBoard[c[0]][c[1]]
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function handleClick(row, col) {
+      if (gameBoard[row][col] === '') {
+        gameBoard[row][col] = currentPlayer;
+        cells[row * 3 + col].textContent = currentPlayer.toUpperCase();
+        // Set the text content of the cell
+
+
+        // Remove previous class (if any) and add a new class for the current player
+        cells[row * 3 + col].classList.remove("x", "o");
+
+        cells[row * 3 + col].classList.add(currentPlayer);
+
+
+        if (checkWinner()) {
+          winFunction(currentPlayer);
+        } else if (isBoardFull()) {
+          drawFunction();
+        } else {
+          currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
+        }
+      }
+    }
+
+    function isBoardFull() {
+      for (const row of gameBoard) {
+        if (row.includes('')) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    cells.forEach((cell) => {
+      const row = parseInt(cell.dataset.row);
+      const col = parseInt(cell.dataset.col);
+      cell.addEventListener('click', () => handleClick(row, col));
+    });
+
+    //Disable All Buttons
+    const disableButtons = () => {
+      cells.forEach((element) => {element.disabled = true});
+      //enable popup
+      popupRef.classList.remove("hide");
+    };
+
+    //Enable all buttons (For New Game and Restart)
+    const enableButtons = () => {
+      cells.forEach((element) => {
+        element.innerText = '';
+        element.disabled = false;
+      });
+      //disable popup
+      popupRef.classList.add("hide");
+    };
+
+    const winFunction = (letter) => {
+      disableButtons();
+      msgRef.innerHTML = `Player ${letter.toUpperCase()} Wins`;
+    };
+
+    //Function for draw
+    const drawFunction = () => {
+      disableButtons();
+      msgRef.innerHTML = `It's a Draw`;
+    };
+
+    //New Game
+    newgameBtn.addEventListener("click", () => {
+      currentPlayer = 'x';
+      gameBoard = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+      ];
+      
+      enableButtons();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      currentPlayer = 'x';
+      gameBoard = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+      ];
+      
+      enableButtons();
+    });
+
+    // Initialize the game
+    //Enable Buttons and disable popup on page load
+    window.onload = enableButtons;
+  </script>
+</body>
+</html>
